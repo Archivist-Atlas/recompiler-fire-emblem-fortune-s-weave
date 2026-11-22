@@ -1,0 +1,85 @@
+{
+  "game_name": "Fire Emblem Fortune's Weave",
+  "version": "131072 (PC Recomp)",
+  "icon": "game_icon.ico",
+  "icon_png": "game_icon.png",
+  "rom_env_var": "FEFW_RECOMP_NUP",
+  "working_dir": ".",
+  "command": [
+    "fefw.exe"
+  ],
+  "options": [
+    {
+      "id": "fullscreen",
+      "category": "Affichage & Audio",
+      "env_var": "FEFW_FULLSCREEN",
+      "on_value": "1",
+      "off_value": "0",
+      "label": "Mode Plein Écran au démarrage (F11 pour basculer)",
+      "description": "Désactivé par défaut (fenêtré 720p). En jeu, appuyez sur F11 à tout moment pour basculer en plein écran, et Échap pour quitter.",
+      "default": false
+    },
+    {
+      "id": "fps60",
+      "category": "Affichage & Audio",
+      "env_var": "FEFW_FPS60",
+      "on_value": "1",
+      "off_value": "0",
+      "label": "Débloquer 60 FPS",
+      "description": "Active la cible 60 FPS au lieu de la limite par défaut.",
+      "default": true
+    },
+    {
+      "id": "vsync",
+      "category": "Affichage & Audio",
+      "env_var": "FEFW_VSYNC",
+      "on_value": "1",
+      "off_value": "0",
+      "label": "Synchronisation verticale (V-Sync)",
+      "description": "Synchronise l'affichage avec le taux de rafraîchissement de l'écran pour éviter le déchirement d'image.",
+      "default": false
+    },
+    {
+      "id": "astc_fast",
+      "category": "Rendu & Shaders",
+      "env_var": "NXRT_GFX_ASTC_QUALITY",
+      "on_value": "fast",
+      "off_value": "high",
+      "label": "Décodage ASTC rapide",
+      "description": "Accélère le chargement des textures ASTC au prix d'une légère baisse de qualité visuelle.",
+      "default": false
+    },
+    {
+      "id": "shader_prewarm",
+      "category": "Rendu & Shaders",
+      "env_var": "NXRT_NVN_PREWARM",
+      "on_value": "1",
+      "off_value": "0",
+      "label": "Pré-compilation du cache de shaders",
+      "description": "Pré-compile les pipelines Vulkan connus au démarrage pour réduire les micro-saccades en jeu.",
+      "default": true
+    },
+    {
+      "id": "console",
+      "category": "Système & Avancé",
+      "env_var": "FEFW_CONSOLE",
+      "on_value": "1",
+      "off_value": "0",
+      "label": "Afficher la console de diagnostic",
+      "description": "Affiche la fenêtre console de logs en arrière-plan au démarrage.",
+      "default": false
+    }
+  ],
+  "env": {
+    "FEFW_FULLSCREEN": "0",
+    "FEFW_FPS60": "1",
+    "FEFW_VSYNC": "0",
+    "NXRT_GFX_ASTC_QUALITY": "high",
+    "NXRT_NVN_PREWARM": "1",
+    "FEFW_CONSOLE": "0"
+  },
+  "expected_title_ids": [
+    "04007EF01F8AE000",
+    "04007EF01F8AE800"
+  ]
+}

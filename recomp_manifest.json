@@ -1,0 +1,42 @@
+{
+  "id": "fire-emblem-fortune-s-weave",
+  "name": "Fire Emblem: Fortune's Weave",
+  "recompiler_name": "EmblemWeave / fefw-recomp (XiØN / Goldoire)",
+  "title_ids": [
+    "04007EF01F8AE000",
+    "04007EF01F8AE800"
+  ],
+  "supported_versions": [
+    0,
+    131072
+  ],
+  "expected_builds": [
+    {
+      "version": 131072,
+      "label": "Update 131072",
+      "nso_build_ids": {
+        "main": "db93b0125f4850601d61c3edde012f8eb2ecfe77",
+        "rtld": "0ead38ad96dad995d35cb2e70d854a9edc29ec7a",
+        "sdk": "5b1602f3a2965f44ab13124cadbdf1483c7babc6",
+        "subsdk0": "3adf85c89d764277221dc7707b40f42f513fc97b",
+        "subsdk1": "45eac7636ffc32c7b7c12312707817ab97713317",
+        "subsdk2": "7d73f8e808341683306a4425a4989ed5b6277dbc"
+      },
+      "exefs_sha256": {
+        "main": "616e7d906936ea4c2d908d0553cf69779e60242d769c40722267ee8bcb98e79a",
+        "main.npdm": "82c588db879e28895474813f060698cf8dc09f2d61393211d9f20aa03b342554",
+        "rtld": "376589bd64cc13d737de855f6c40cdecd5a4f57b366f4b90cec31342835d9b30",
+        "sdk": "70ba2342fc223f28fdd032611a4e430242669b36af94c631667164bc1cfdfdd3",
+        "subsdk0": "fcec218a2b1a8b35e39bcaf4e09ee820cf5932bdb61e046ca4ab3031d20a9e36",
+        "subsdk1": "e84b123613b8072ec4b74d711ac6f59d46330a45ecf14c33286db72eb8a68cdd",
+        "subsdk2": "6114f662568bd980ccc4e869adbc4e4dfae4b837ca9f6d96d4e67cb435d1e149"
+      }
+    }
+  ],
+  "default_output_subdir": "Fire Emblem Fortune's Weave",
+  "shortcut_name": "Fire Emblem Fortune's Weave",
+  "windows_entrypoint": "install.ps1",
+  "script": "install.ps1",
+  "icon": "game_icon.ico",
+  "description": "Recompile Fire Emblem: Fortune's Weave (Nintendo Switch 2, Update 131072 depuis votre .nup ou dossier exefs/romfs) en exécutable Windows PC natif (SDL3 / Vulkan, mode fenêtré 720p par défaut, plein écran via F11, Échap pour quitter)."
+}
