@@ -1,0 +1,164 @@
+# hook sites of main (build DB93B0125F4850601D61C3EDDE012F8EB2ECFE77)
+# frame rate (runtime games/fefw/fefw_play.cpp, [fefw] fps60): the gameplay start's target frame rate store `str w9, [x8, #0x1dc]`
+# into the graphics object (w9 = 30, from `mov w9, #0x1e` at 0x71007bf1ac)
+inline 0x71007bf1c0
+# movies (runtime games/fefw/fefw_movie.cpp, [media] movies = host): the player's setup (0x1906510) picks native images or frames in CPU
+# buffers by the byte at +0x1318 (`ldrb w21` at 0x190654c); the host decoder fills CPU buffers, so the site at the next instruction sets w21 = 1.
+# On that path the player sets its frame count (+0xff8) to 4 only after making the buffers (2 by default, 0x1903ae0): the site before that sets it
+# first (nxnative-penis6 patches.py does both by rewriting the code)
+inline 0x7101906550
+inline 0x7101906634
+# frame update (runtime games/fefw/fefw_game.cpp, play mode): the present wrapper (nvnWindowSetPresentInterval, nvnQueuePresentTexture), once per
+# presented frame on the main thread; it pumps play mode (window events, the gamepad into the npad state)
+entryhook 0x710005d170
+# time step (runtime games/fefw/fefw_play.cpp, [fefw] smooth_step, on with fps120): app::time::Manager's step (0x180eea0) before its clamp
+# (`ldr s0, [x19, #0x168]`): s0 = the measured time since the last frame and s1 = the step the game chose (60 / target unless s0 is over it
+# by 0.1), both in frames of 1/59.94 s; the hook may replace s1
+inline 0x710180ef44
+# map cursor (runtime games/fefw/fefw_play.cpp, [fefw] cursor_real_time): game::map::Cursor::Impl::Tick (0x735020) moves the battle / world map
+# cursor by the stick times 5 * 60 / target frame rate (graphics +0x1dc) per frame; at each site s0 = 60 / target was just divided out
+# (`fdiv s0, s1, s0`) and the hook may replace it with the frame's real step
+inline 0x71007358b8
+inline 0x7100735934
+# ultrawide (runtime games/fefw/fefw_wide.cpp, [fefw] ultrawide). The camera, UI, scissor, marker, 2D-effect and movie sites follow Kompas9's
+# MIT-licensed 3440x1440 IPS for this build (github.com/Kompas9/Switch-Game-Patches, games/Fire-Emblem-Fortunes-Weave); the picture / window
+# and off-screen indicator sites are this port's. The runtime computes every value from the output's aspect.
+# perspective camera update (0xb51420), after its prologue: x0 = the camera, its aspect as two floats at +0x70 / +0x74 (16, 9)
+inline 0x7100b51440
+# the 2D draw info's projection setter (0x5769d0): `ret` after the 4x4 matrix is copied to x0 + 0x10 (1920x1080 layouts: 1/960, -1/540)
+inline 0x7100576a10
+# nn::ui2d Picture::Calculate (0x595740) and Window::Calculate (0x5af080), after their LoadMtx (vtable + 0xf8) put the pane's global matrix
+# into the draw info's model-view (+0x80) and before it goes to the pane's constant buffer: picture x19 / window x20 = the pane, the other
+# the draw info. A pane covering the whole 1920 layout width (dims, backdrops) is widened there
+inline 0x7100595784
+inline 0x71005af0b8
+# scissor pane (0x5975a0): before `fsub s4, s3, s5` the scissor's left edge s5 and width s7 are in viewport pixels (x1 = the draw info)
+inline 0x71005976d4
+# world-to-screen in 1920x1080 UI units: before `fmadd s1, s1, s2, s2` (s2 = 960; at 0xa7f148 `fmadd s2, s2, s3, s3`) the x is in NDC
+inline 0x7100a7f148
+inline 0x7100b81bfc
+inline 0x7100d939cc
+inline 0x7100d943c4
+inline 0x7100d94528
+inline 0x7100d94670
+inline 0x7100d947b8
+inline 0x7100d94900
+inline 0x7100d94a44
+inline 0x7100d94b88
+inline 0x7100d94ccc
+inline 0x7101912700
+inline 0x71019131ec
+# off-screen indicator (0x18f3760): before `fmul s3, s2, s1` (s2 = 960) s1 is the x in NDC
+inline 0x71018f38c0
+# 2D effects (0xb76680): the ortho built from the effect's screen size (x22) on the stack at sp + 0x80 before `movi d0, #0`; the two
+# full-target scissors (`blr x8`, vtable + 0x58); the epilogue
+inline 0x7100b768d4
+inline 0x7100b76bb0
+inline 0x7100b76cfc
+inline 0x7100b76d9c
+# stat radar chart (0x17d8e80, this port's own): after its loop has put the 8 ring points at sp + 0x20 (x, y floats in 1920x1080 layout pixels)
+# and the centre at sp + 0x10 (x) / sp + 0 (y), before they are pushed into the 2D primitive buffer (which is mapped over the whole output)
+inline 0x71017d90b0
+# world / quest map (this port's own): the location dots (0x16bb860) and the route lines (0x16bd660) are pushed into the same 2D primitive
+# buffer in 1920x1080 layout pixels. A batch's start (where x0 / [x0] is the renderer, before its batch start 0x19ca6c0) and its end (the
+# dots function's epilogue; the lines' loop exit before the tail-called batch end 0x19ca3e0): the end hook moves every vertex pushed since
+inline 0x71016bbe98
+inline 0x71016bcef8
+inline 0x71016bd704
+inline 0x71016bdfbc
+# movies (0x1904aa0): after the render target is set (`ldr x0, [x19, #8]`, x20 + 0x10 = its size) and before the tail-called draw
+# (vtable + 0x110); the midhook draws, puts the viewport back and returns
+inline 0x7101904b5c
+midhook 0x7101904c20
+
+# frame-rate fixes (runtime games/fefw/fefw_frame.cpp, [fefw] frame_fixes): per-frame amounts made for 30 fps kept at
+# their real speed at 60 and 120 (site map after Fortune's Eden, TheSneakyBadger, GPL-3.0-or-later). Each inline site is the instruction after
+# the one that makes the game's value: after the movk of a per-frame constant (dt 1/30, PhysX step, cloth gravity, easing factors, UI
+# timers), and in the cloth step (0xa68640), CharacterIllusion, CharacterLookAt, the map markers / UI angle / timer, PhysX substeps, the BGM
+# marquee and the avatar turntable. 0x652960 and 0x66af3c are the title / menu target stores (60, beside the gameplay one at 0x7bf1c0).
+inline 0x7100652960
+inline 0x710066af3c
+inline 0x7100a686ec
+inline 0x7100a68738
+inline 0x7100a687e8
+inline 0x7100a687f4
+inline 0x7100a68994
+inline 0x7100a68a9c
+inline 0x7100ab2490
+inline 0x7100da1f4c
+inline 0x7100f3a968
+inline 0x710107eadc
+inline 0x710108049c
+inline 0x71010804cc
+inline 0x7101084ee8
+inline 0x7101087658
+inline 0x7101089594
+inline 0x71010896a8
+inline 0x7101089848
+inline 0x7101089a64
+inline 0x71010ad648
+inline 0x71010d7324
+inline 0x7101121a60
+inline 0x7101121ab4
+inline 0x710112291c
+inline 0x71011271dc
+inline 0x7101128584
+inline 0x7101129e08
+inline 0x710112bfcc
+inline 0x710112c014
+inline 0x710113ed70
+inline 0x710113edb8
+inline 0x71011e62c4
+inline 0x710133fb94
+inline 0x710133fd1c
+inline 0x710133feb8
+inline 0x71014cf5dc
+inline 0x71014cfdc0
+inline 0x710159b818
+inline 0x71016665ec
+inline 0x71016a8d6c
+inline 0x71016a8d78
+inline 0x71016a8ef8
+inline 0x71016a8efc
+inline 0x71016a8f44
+inline 0x71017cc0ec
+inline 0x71017cea78
+inline 0x71017cee44
+inline 0x71017cf37c
+inline 0x71017cf3fc
+inline 0x71017cf418
+inline 0x71017cf444
+inline 0x71017cf478
+inline 0x71017cf498
+inline 0x71017cf540
+inline 0x71017cf55c
+inline 0x71017cf580
+inline 0x71017cf5a4
+# the cutscene quake block of evt::demo::Seq (0x11e9b50, from 0x11ea5cc to 0x11eb084) draws a new random offset each frame: it runs on 30 Hz
+# ticks, and on the other frames the midhook at its start runs the function's rest from the block's end (f_11eb084; flags are set again at
+# 0x11eb0b4 before anything reads them)
+midhook 0x71011ea5cc
+midhook 0x71011eb084
+# spoken text (fefw_frame.cpp, [fefw] frame_fixes): the talk sequence asks the text step 0x115d330 (x0 = the window's text, w1 =
+# letters to add, 3 a frame from 0x1154754) -> w0 finished; the entry hook skips it off the 30 Hz ticks (after Fortune's Eden v1.6.8.6)
+entryhook 0x710115d330
+
+# hub NPCs (runtime games/fefw/fefw_crowd.cpp, [display] npc_distance): the crowd update (map::zv crowd, 0x1041880).
+# model limit: before `str w8, [x19, #16]`, w8 = the game parameter "hub character model hash limit" (how many distinct NPC models the
+# crowd keeps loaded; at the limit an NPC whose model is not loaded yet is not shown, even close by)
+inline 0x7101041b18
+# display distance: after s8 = the game parameter "hub character display distance" (an int, metres) and before `fmul s0, s8, s8`; the
+# update stores R^2, R^2, (R + 40)^2 and (R + 100)^2 as the crowd's show / hide distances
+inline 0x7101041c54
+# draw budget: after each of the update's three `fmov s9, #1.0` (the limit of max(cost / 600000, count / 80); once reached, every
+# further townsperson that frame is hidden)
+inline 0x7101042680
+inline 0x7101042898
+inline 0x7101042c20
+# [fefw] npc_log: the update's reference position (v2) and the character show / hide call (x0 chara, w1 mode)
+inline 0x7101041d7c
+entryhook 0x7100d039e0
+# unit detail page crash (0x1702420, the page builder): for a unit with a mount whose class has no dismounted class (e.g. Io), the class's
+# exclusive-item count was read through a null class pointer (address 0x80). `csel x8, xzr, x22, eq` -> `mov x8, x22`: x8 is never null.
+# From xinthefreefallxai/ObeliskChamber patches/unitinfo_animal_crashfix.
+patch 0x7101703498 9a9603e8 aa1603e8
